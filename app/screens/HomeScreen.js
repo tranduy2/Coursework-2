@@ -28,17 +28,14 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // useEffect này sẽ chạy MỖI KHI màn hình được focus (quay lại)
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       loadHikes();
     });
 
-    // Cleanup listener
     return unsubscribe;
   }, [navigation]);
 
-  // Xử lý xóa một hike
   const handleDeleteHike = (id) => {
     Alert.alert(
       'Delete Hike',
@@ -52,7 +49,7 @@ const HomeScreen = ({ navigation }) => {
             try {
               await deleteHike(id);
               Alert.alert('Success', 'Hike deleted.');
-              loadHikes(); // Tải lại danh sách
+              loadHikes();
             } catch (error) {
               console.error(error);
               Alert.alert('Error', 'Failed to delete hike.');
@@ -63,7 +60,6 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  // Xử lý Reset (Xóa tất cả)
   const handleResetAll = () => {
     Alert.alert(
       'Reset Database',
@@ -77,7 +73,7 @@ const HomeScreen = ({ navigation }) => {
             try {
               await deleteAllHikes();
               Alert.alert('Success', 'All hikes have been deleted.');
-              setHikes([]); // Xóa state
+              setHikes([]);
             } catch (error) {
               console.error(error);
               Alert.alert('Error', 'Failed to reset database.');

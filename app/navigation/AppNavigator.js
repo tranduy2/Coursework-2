@@ -21,7 +21,6 @@ const AppNavigator = () => {
           name="AddHike"
           component={AddHikeScreen}
           options={({ route }) => ({
-            // Đặt tiêu đề là 'Edit Hike' nếu có hikeToEdit, ngược lại là 'Add New Hike'
             title: route.params?.hikeToEdit ? 'Edit Hike' : 'Add New Hike',
           })}
         />

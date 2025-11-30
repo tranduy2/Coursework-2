@@ -1,9 +1,7 @@
-import { openDatabase } from 'react-native-sqlite-storage';
+import * as SQLite from 'expo-sqlite';
+const db = SQLite.openDatabase('HikesDB.db');
 
-// Mở (hoặc tạo) database
-const db = openDatabase({ name: 'HikesDB.db', location: 'default' });
-
-// Hàm khởi tạo bảng (chạy một lần khi app mở)
+// Hàm khởi tạo bảng
 export const initDB = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -21,14 +19,13 @@ export const initDB = () => {
           'custom_field2 TEXT' +
           ');',
         [],
-        () => resolve(), // Thành công
-        (_, err) => reject(err), // Thất bại
+        () => resolve(), 
+        (_, err) => reject(err) 
       );
     });
   });
 };
 
-// Hàm thêm hike
 export const addHike = (hike) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -45,14 +42,13 @@ export const addHike = (hike) => {
           hike.custom_field1,
           hike.custom_field2,
         ],
-        (_, result) => resolve(result.insertId), // Trả về ID
-        (_, err) => reject(err),
+        (_, result) => resolve(result.insertId),
+        (_, err) => reject(err)
       );
     });
   });
 };
 
-// Hàm cập nhật (Edit) một hike
 export const updateHike = (hike) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -68,36 +64,30 @@ export const updateHike = (hike) => {
           hike.description,
           hike.custom_field1,
           hike.custom_field2,
-          hike.id, // ID của hike cần cập nhật
+          hike.id,
         ],
-        (_, result) => resolve(result.rowsAffected), // Trả về số hàng bị ảnh hưởng
-        (_, err) => reject(err),
+        (_, result) => resolve(result.rowsAffected),
+        (_, err) => reject(err)
       );
     });
   });
 };
 
-// Hàm lấy tất cả hikes
 export const getAllHikes = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
         'SELECT * FROM hikes',
         [],
-        (_, results) => {
-          let temp = [];
-          for (let i = 0; i < results.rows.length; ++i) {
-            temp.push(results.rows.item(i));
-          }
-          resolve(temp); // Trả về mảng các hikes
+        (_, { rows: { _array } }) => {
+          resolve(_array); 
         },
-        (_, err) => reject(err),
+        (_, err) => reject(err)
       );
     });
   });
 };
 
-// Hàm xóa một hike
 export const deleteHike = (id) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -105,13 +95,12 @@ export const deleteHike = (id) => {
         'DELETE FROM hikes WHERE id = ?',
         [id],
         (_, result) => resolve(result.rowsAffected),
-        (_, err) => reject(err),
+        (_, err) => reject(err)
       );
     });
   });
 };
 
-// Hàm xóa TẤT CẢ hikes (Reset)
 export const deleteAllHikes = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -119,7 +108,7 @@ export const deleteAllHikes = () => {
         'DELETE FROM hikes',
         [],
         (_, result) => resolve(result.rowsAffected),
-        (_, err) => reject(err),
+        (_, err) => reject(err)
       );
     });
   });

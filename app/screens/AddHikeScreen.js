@@ -1,49 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  ScrollView,
-  Platform,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Platform, TouchableOpacity, Alert,} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { updateHike } from '../database/Database'; // Import hàm update
+import { updateHike } from '../database/Database';
+
 
 const AddHikeScreen = ({ navigation, route }) => {
-  // Lấy hikeToEdit từ params (nếu có)
   const hikeToEdit = route.params?.hikeToEdit;
   const isEditMode = !!hikeToEdit;
 
-  // States cho các trường
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
-  const [date, setDate] = useState(new Date()); // Dùng object Date
-  const [parking, setParking] = useState('No'); // Mặc định 'No'
+  const [date, setDate] = useState(new Date()); 
+  const [parking, setParking] = useState('No'); 
   const [length, setLength] = useState('');
-  const [difficulty, setDifficulty] = useState('Easy'); // Mặc định 'Easy'
+  const [difficulty, setDifficulty] = useState('Easy');
   const [description, setDescription] = useState('');
   const [customField1, setCustomField1] = useState('');
   const [customField2, setCustomField2] = useState('');
 
-  // States cho lỗi
   const [errors, setErrors] = useState({});
 
-  // State cho DatePicker
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // useEffect để điền dữ liệu nếu là chế độ Edit
   useEffect(() => {
     if (isEditMode) {
       setName(hikeToEdit.name);
       setLocation(hikeToEdit.location);
-      setDate(new Date(hikeToEdit.date)); // Chuyển string từ DB về Date
+      setDate(new Date(hikeToEdit.date)); 
       setParking(hikeToEdit.parking);
-      setLength(String(hikeToEdit.length)); // Chuyển số về string
+      setLength(String(hikeToEdit.length)); 
       setDifficulty(hikeToEdit.difficulty);
       setDescription(hikeToEdit.description || '');
       setCustomField1(hikeToEdit.custom_field1 || '');
@@ -51,15 +36,13 @@ const AddHikeScreen = ({ navigation, route }) => {
     }
   }, [isEditMode, hikeToEdit]);
 
-  // Hàm xử lý khi chọn ngày
   const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(Platform.OS === 'ios'); // Tắt modal trên iOS
+    setShowDatePicker(Platform.OS === 'ios'); 
     if (selectedDate) {
       setDate(selectedDate);
     }
   };
 
-  // Hàm validation
   const validateForm = () => {
     let newErrors = {};
     if (!name.trim()) newErrors.name = 'Name is required';
@@ -69,19 +52,17 @@ const AddHikeScreen = ({ navigation, route }) => {
     } else if (isNaN(Number(length)) || Number(length) <= 0) {
       newErrors.length = 'Length must be a positive number';
     }
-    // Date, Parking, Difficulty luôn có giá trị mặc định nên không cần check
-
+    
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Hàm xử lý khi nhấn nút Save
   const handleSave = async () => {
     if (validateForm()) {
       const hikeData = {
         name,
         location,
-        date: date.toISOString().split('T')[0], // Format: YYYY-MM-DD
+        date: date.toLocaleDateString('en-CA'),
         parking,
         length: parseFloat(length),
         difficulty,
@@ -91,18 +72,15 @@ const AddHikeScreen = ({ navigation, route }) => {
       };
 
       if (isEditMode) {
-        // --- CHẾ ĐỘ EDIT (Task f) ---
         try {
           await updateHike({ ...hikeData, id: hikeToEdit.id });
           Alert.alert('Success', 'Hike updated successfully!');
-          navigation.navigate('Home'); // Quay về Home sau khi update
+          navigation.navigate('Home'); 
         } catch (error) {
           console.error(error);
           Alert.alert('Error', 'Failed to update hike.');
         }
       } else {
-        // --- CHẾ ĐỘ ADD MỚI (Task e) ---
-        // Chuyển sang màn hình Confirmation
         navigation.navigate('Confirmation', { hikeData: hikeData });
       }
     } else {
@@ -112,7 +90,7 @@ const AddHikeScreen = ({ navigation, route }) => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Name */}
+      
       <Text style={styles.label}>Hike Name *</Text>
       <TextInput
         style={styles.input}
@@ -122,7 +100,7 @@ const AddHikeScreen = ({ navigation, route }) => {
       />
       {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-      {/* Location */}
+
       <Text style={styles.label}>Location *</Text>
       <TextInput
         style={styles.input}
@@ -132,13 +110,13 @@ const AddHikeScreen = ({ navigation, route }) => {
       />
       {errors.location && <Text style={styles.errorText}>{errors.location}</Text>}
 
-      {/* Date */}
+
       <Text style={styles.label}>Date of the Hike *</Text>
       <TouchableOpacity onPress={() => setShowDatePicker(true)}>
         <TextInput
           style={styles.input}
-          value={date.toLocaleDateString()} // Hiển thị ngày đã chọn
-          editable={false} // Không cho gõ tay
+          value={date.toLocaleDateString()} 
+          editable={false} 
         />
       </TouchableOpacity>
       {showDatePicker && (
@@ -150,17 +128,25 @@ const AddHikeScreen = ({ navigation, route }) => {
         />
       )}
 
-      {/* Parking */}
-      <Text style={styles.label}>Parking Available *</Text>
-      <Picker
-        selectedValue={parking}
-        style={styles.picker}
-        onValueChange={(itemValue) => setParking(itemValue)}>
-        <Picker.Item label="No" value="No" />
-        <Picker.Item label="Yes" value="Yes" />
-      </Picker>
 
-      {/* Length */}
+      <Text style={styles.label}>Parking Available *</Text>
+      <View style={styles.radioContainer}>
+        <TouchableOpacity 
+          style={[styles.radioButton, parking === 'Yes' && styles.radioButtonSelected]} 
+          onPress={() => setParking('Yes')}
+        >
+          <Text style={[styles.radioText, parking === 'Yes' && styles.radioTextSelected]}>Yes</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.radioButton, parking === 'No' && styles.radioButtonSelected]} 
+          onPress={() => setParking('No')}
+        >
+          <Text style={[styles.radioText, parking === 'No' && styles.radioTextSelected]}>No</Text>
+        </TouchableOpacity>
+      </View>
+
+
       <Text style={styles.label}>Hike Length (km) *</Text>
       <TextInput
         style={styles.input}
@@ -171,18 +157,23 @@ const AddHikeScreen = ({ navigation, route }) => {
       />
       {errors.length && <Text style={styles.errorText}>{errors.length}</Text>}
 
-      {/* Difficulty */}
-      <Text style={styles.label}>Difficulty Level *</Text>
-      <Picker
-        selectedValue={difficulty}
-        style={styles.picker}
-        onValueChange={(itemValue) => setDifficulty(itemValue)}>
-        <Picker.Item label="Easy" value="Easy" />
-        <Picker.Item label="Medium" value="Medium" />
-        <Picker.Item label="Hard" value="Hard" />
-      </Picker>
 
-      {/* Description (Optional) */}
+      <Text style={styles.label}>Difficulty Level *</Text>
+      <View style={styles.radioContainer}>
+        {['Easy', 'Medium', 'Hard'].map((level) => (
+          <TouchableOpacity
+            key={level}
+            style={[styles.radioButton, difficulty === level && styles.radioButtonSelected]}
+            onPress={() => setDifficulty(level)}
+          >
+            <Text style={[styles.radioText, difficulty === level && styles.radioTextSelected]}>
+              {level}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+
       <Text style={styles.label}>Description (Optional)</Text>
       <TextInput
         style={[styles.input, styles.textArea]}
@@ -193,7 +184,6 @@ const AddHikeScreen = ({ navigation, route }) => {
         numberOfLines={3}
       />
 
-      {/* Custom Fields (Optional) */}
       <Text style={styles.label}>Custom Field 1 (Optional)</Text>
       <TextInput
         style={styles.input}
@@ -237,12 +227,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#f9f9f9',
   },
-  picker: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    backgroundColor: '#f9f9f9',
-  },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
@@ -255,6 +239,33 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginTop: 30,
     marginBottom: 50,
+  },
+  radioContainer: {
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  radioButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    marginHorizontal: 2,
+    borderRadius: 5,
+  },
+  radioButtonSelected: {
+    backgroundColor: '#007AFF', 
+    borderColor: '#007AFF',
+  },
+  radioText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  radioTextSelected: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 
