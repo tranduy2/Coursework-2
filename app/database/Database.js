@@ -1,7 +1,7 @@
 import * as SQLite from 'expo-sqlite';
+
 const db = SQLite.openDatabase('HikesDB.db');
 
-// Hàm khởi tạo bảng
 export const initDB = () => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
@@ -16,11 +16,12 @@ export const initDB = () => {
           'difficulty TEXT NOT NULL, ' +
           'description TEXT, ' +
           'custom_field1 TEXT, ' +
-          'custom_field2 TEXT' +
+          'custom_field2 TEXT, ' +
+          'image TEXT' +
           ');',
         [],
-        () => resolve(), 
-        (_, err) => reject(err) 
+        () => resolve(),
+        (_, err) => reject(err)
       );
     });
   });
@@ -30,7 +31,7 @@ export const addHike = (hike) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'INSERT INTO hikes (name, location, date, parking, length, difficulty, description, custom_field1, custom_field2) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO hikes (name, location, date, parking, length, difficulty, description, custom_field1, custom_field2, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           hike.name,
           hike.location,
@@ -41,6 +42,7 @@ export const addHike = (hike) => {
           hike.description,
           hike.custom_field1,
           hike.custom_field2,
+          hike.image, 
         ],
         (_, result) => resolve(result.insertId),
         (_, err) => reject(err)
@@ -53,7 +55,7 @@ export const updateHike = (hike) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'UPDATE hikes SET name = ?, location = ?, date = ?, parking = ?, length = ?, difficulty = ?, description = ?, custom_field1 = ?, custom_field2 = ? WHERE id = ?',
+        'UPDATE hikes SET name = ?, location = ?, date = ?, parking = ?, length = ?, difficulty = ?, description = ?, custom_field1 = ?, custom_field2 = ?, image = ? WHERE id = ?',
         [
           hike.name,
           hike.location,
@@ -64,6 +66,7 @@ export const updateHike = (hike) => {
           hike.description,
           hike.custom_field1,
           hike.custom_field2,
+          hike.image, 
           hike.id,
         ],
         (_, result) => resolve(result.rowsAffected),
@@ -79,9 +82,7 @@ export const getAllHikes = () => {
       tx.executeSql(
         'SELECT * FROM hikes',
         [],
-        (_, { rows: { _array } }) => {
-          resolve(_array); 
-        },
+        (_, { rows: { _array } }) => resolve(_array),
         (_, err) => reject(err)
       );
     });

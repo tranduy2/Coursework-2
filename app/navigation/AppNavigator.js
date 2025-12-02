@@ -11,17 +11,28 @@ const Stack = createNativeStackNavigator();
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator 
+        initialRouteName="Home"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#172C10',
+          },
+          headerTintColor: '#fff', 
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+      >
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ title: 'Hike Manager' }}
+          options={{ title: 'M-Hike' }}
         />
         <Stack.Screen
           name="AddHike"
           component={AddHikeScreen}
           options={({ route }) => ({
-            title: route.params?.hikeToEdit ? 'Edit Hike' : 'Add New Hike',
+            title: route.params?.hikeToEdit ? 'Edit Hike Details' : 'Add New Hike',
           })}
         />
         <Stack.Screen

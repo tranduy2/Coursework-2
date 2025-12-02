@@ -1,111 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Button,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  getAllHikes,
-  deleteHike,
-  deleteAllHikes,
-} from '../database/Database';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { getAllHikes, deleteHike, deleteAllHikes } from '../database/Database';
 
 const HomeScreen = ({ navigation }) => {
   const [hikes, setHikes] = useState([]);
 
-  // Hàm tải dữ liệu
   const loadHikes = async () => {
     try {
       const data = await getAllHikes();
       setHikes(data);
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Failed to load hikes.');
-    }
+    } catch (error) { console.error(error); }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       loadHikes();
     });
-
     return unsubscribe;
   }, [navigation]);
 
-  const handleDeleteHike = (id) => {
-    Alert.alert(
-      'Delete Hike',
-      'Are you sure you want to delete this hike?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteHike(id);
-              Alert.alert('Success', 'Hike deleted.');
-              loadHikes();
-            } catch (error) {
-              console.error(error);
-              Alert.alert('Error', 'Failed to delete hike.');
-            }
-          },
-        },
-      ],
-    );
+  const handleDelete = (id) => {
+    Alert.alert('Delete', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: async () => {
+          await deleteHike(id);
+          loadHikes();
+      }}
+    ]);
   };
 
-  const handleResetAll = () => {
-    Alert.alert(
-      'Reset Database',
-      'Are you sure you want to delete ALL hikes? This action cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'DELETE ALL',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteAllHikes();
-              Alert.alert('Success', 'All hikes have been deleted.');
-              setHikes([]);
-            } catch (error) {
-              console.error(error);
-              Alert.alert('Error', 'Failed to reset database.');
-            }
-          },
-        },
-      ],
-    );
+  const handleReset = () => {
+    Alert.alert('Warning', 'Delete ALL data?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'DELETE ALL', style: 'destructive', onPress: async () => {
+          await deleteAllHikes();
+          loadHikes();
+      }}
+    ]);
   };
 
-  // Render 1 item trong FlatList
-  const renderHikeItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <View style={styles.itemInfo}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemDetails}>
-          {item.location} - {item.date}
-        </Text>
-        <Text style={styles.itemDetails}>
-          Length: {item.length} km, Difficulty: {item.difficulty}
-        </Text>
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <View style={styles.cardContent}>
+        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardSub}>{item.location} • {item.date}</Text>
       </View>
-      <View style={styles.itemActions}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.editButton]}
-          onPress={() => navigation.navigate('AddHike', { hikeToEdit: item })}>
-          <Text style={styles.actionButtonText}>Edit</Text>
+      <View style={styles.cardActions}>
+        <TouchableOpacity onPress={() => navigation.navigate('AddHike', { hikeToEdit: item })}>
+          <Text style={styles.actionTextEdit}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={() => handleDeleteHike(item.id)}>
-          <Text style={styles.actionButtonText}>Delete</Text>
+        <TouchableOpacity onPress={() => handleDelete(item.id)}>
+          <Text style={styles.actionTextDelete}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -113,89 +58,47 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Button
-        title="Add New Hike"
+      <TouchableOpacity 
+        style={styles.addButton} 
         onPress={() => navigation.navigate('AddHike')}
-      />
+      >
+        <Text style={styles.addButtonText}>ADD NEW HIKE</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={hikes}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderHikeItem}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No hikes found. Add one!</Text>
-        }
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
         style={styles.list}
+        ListEmptyComponent={<Text style={styles.empty}>No hikes yet.</Text>}
       />
 
-      <Button
-        title="Reset (Delete All Hikes)"
-        onPress={handleResetAll}
-        color="#c00"
-      />
+      <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+        <Text style={styles.resetButtonText}>DELETE ALL HIKES</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  list: {
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  itemContainer: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    marginVertical: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#eee',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  itemInfo: {
-    flex: 3,
-  },
-  itemName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  itemDetails: {
-    fontSize: 14,
-    color: '#555',
-  },
-  itemActions: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-  },
-  actionButton: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    marginVertical: 3,
-  },
-  editButton: {
-    backgroundColor: '#007bff',
-  },
-  deleteButton: {
-    backgroundColor: '#dc3545',
-  },
-  actionButtonText: {
-    color: '#fff',
-    fontSize: 12,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 50,
-    fontSize: 16,
-    color: '#888',
-  },
+  container: { flex: 1, padding: 15, backgroundColor: '#f5f5f5' },
+  
+  addButton: { backgroundColor: '#63701D', padding: 15, borderRadius: 8, alignItems: 'center', marginBottom: 10 },
+  addButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+
+  card: { backgroundColor: '#fff', padding: 15, borderRadius: 8, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', elevation: 2 },
+  cardContent: { flex: 1 },
+  cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#172C10' },
+  cardSub: { color: '#666', marginTop: 4 },
+  
+  cardActions: { flexDirection: 'column', alignItems: 'flex-end', gap: 10 },
+  actionTextEdit: { color: '#007AFF', fontWeight: 'bold' },
+  actionTextDelete: { color: '#FF3B30', fontWeight: 'bold' },
+
+  resetButton: { backgroundColor: '#FF3B30', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 5 },
+  resetButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  
+  empty: { textAlign: 'center', marginTop: 50, color: '#999' }
 });
 
 export default HomeScreen;
