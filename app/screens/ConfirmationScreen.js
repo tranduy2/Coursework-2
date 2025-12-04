@@ -38,10 +38,10 @@ const ConfirmationScreen = ({ navigation, route }) => {
       <Text style={styles.value}>{hikeData.location}</Text>
       
       <Text style={styles.label}>Runner Name:</Text>
-      <Text style={styles.value}>{hikeData.custom_field1 || 'N/A'}</Text>
+      <Text style={styles.value}>{hikeData.runner_name || 'N/A'}</Text>
       
       <Text style={styles.label}>Weather:</Text>
-      <Text style={styles.value}>{hikeData.custom_field2 || 'N/A'}</Text>
+      <Text style={styles.value}>{hikeData.weather_condition || 'N/A'}</Text>
 
       <Text style={styles.label}>Date:</Text>
       <Text style={styles.value}>{hikeData.date}</Text>

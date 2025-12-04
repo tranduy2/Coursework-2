@@ -15,8 +15,8 @@ export const initDB = () => {
           'length REAL NOT NULL, ' +
           'difficulty TEXT NOT NULL, ' +
           'description TEXT, ' +
-          'custom_field1 TEXT, ' +
-          'custom_field2 TEXT, ' +
+          'runner_name TEXT, ' +
+          'weather_condition TEXT, ' +
           'image TEXT' +
           ');',
         [],
@@ -31,7 +31,7 @@ export const addHike = (hike) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'INSERT INTO hikes (name, location, date, parking, length, difficulty, description, custom_field1, custom_field2, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO hikes (name, location, date, parking, length, difficulty, description, runner_name, weather_condition, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           hike.name,
           hike.location,
@@ -40,8 +40,8 @@ export const addHike = (hike) => {
           hike.length,
           hike.difficulty,
           hike.description,
-          hike.custom_field1,
-          hike.custom_field2,
+          hike.runner_name,
+          hike.weather_condition,
           hike.image, 
         ],
         (_, result) => resolve(result.insertId),
@@ -55,7 +55,7 @@ export const updateHike = (hike) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'UPDATE hikes SET name = ?, location = ?, date = ?, parking = ?, length = ?, difficulty = ?, description = ?, custom_field1 = ?, custom_field2 = ?, image = ? WHERE id = ?',
+        'UPDATE hikes SET name = ?, location = ?, date = ?, parking = ?, length = ?, difficulty = ?, description = ?, runner_name = ?, weather_condition = ?, image = ? WHERE id = ?',
         [
           hike.name,
           hike.location,
@@ -64,8 +64,8 @@ export const updateHike = (hike) => {
           hike.length,
           hike.difficulty,
           hike.description,
-          hike.custom_field1,
-          hike.custom_field2,
+          hike.runner_name,
+          hike.weather_condition,
           hike.image, 
           hike.id,
         ],

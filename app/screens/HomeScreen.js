@@ -64,7 +64,7 @@ const HomeScreen = ({ navigation }) => {
       >
         <Text style={styles.addButtonText}>ADD NEW HIKE</Text>
       </TouchableOpacity>
-
+  
       <FlatList
         data={hikes}
         keyExtractor={item => item.id.toString()}

@@ -43,8 +43,8 @@ const AddHikeScreen = ({ navigation, route }) => {
       setLength(String(hikeToEdit.length));
       setDifficulty(hikeToEdit.difficulty);
       setDescription(hikeToEdit.description || '');
-      setRunnerName(hikeToEdit.custom_field1 || '');
-      setWeather(hikeToEdit.custom_field2 || '');
+      setRunnerName(hikeToEdit.runner_name || '');
+      setWeather(hikeToEdit.weather_condition || '');
       setImage(hikeToEdit.image || null);
     }
   }, [isEditMode, hikeToEdit]);
@@ -86,8 +86,8 @@ const AddHikeScreen = ({ navigation, route }) => {
         name, location,
         date: date.toLocaleDateString('en-CA'),
         parking, length: parseFloat(length), difficulty, description,
-        custom_field1: runnerName,
-        custom_field2: weather,
+        runner_name: runnerName,
+        weather_condition: weather,
         image: image,
       };
 
